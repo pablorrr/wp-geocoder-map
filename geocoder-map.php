@@ -6,6 +6,7 @@
  * Author: PABLOZZZ
  * Author URI: http://websitecreator.pl
  * License: GPLv2
+ * License url: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  *
  */
 if ( ! defined( 'ABSPATH' ) ) exit; 
