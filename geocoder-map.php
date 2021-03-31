@@ -21,36 +21,39 @@
 
 // If this file is called directly, abort.
 use Includes\Geocoder_Map;
+use Includes\Geocoder_Map_Updater;
 
-if ( ! defined( 'WPINC' ) ) {
-	die;
+
+if (!defined('WPINC')) {
+    die;
 }
 
-define( 'GEOCODER_MAP_REQUIRED_PHP_VERSION', '5.3' ); // because of get_called_class()
-define( 'GEOCODER_MAP_REQUIRED_WP_VERSION',  '3.0' );
-define( 'GEOCODER_MAP_REQUIRED_WP_NETWORK',  false ); // because plugin is not compatible with WordPress multisite
+define('GEOCODER_MAP_REQUIRED_PHP_VERSION', '5.3'); // because of get_called_class()
+define('GEOCODER_MAP_REQUIRED_WP_VERSION', '3.0');
+define('GEOCODER_MAP_REQUIRED_WP_NETWORK', false); // because plugin is not compatible with WordPress multisite
 
 /**
  * Checks if the system requirements are met
  *
- * @since    1.0.0
  * @return bool True if system requirements are met, false if not
+ * @since    1.0.0
  */
-function geocoder_map_requirements_met() {
+function geocoder_map_requirements_met()
+{
 
-	global $wp_version;
+    global $wp_version;
 
-	if ( version_compare( PHP_VERSION, GEOCODER_MAP_REQUIRED_PHP_VERSION, '<' ) ) {
-		return false;
-	}
-	if ( version_compare( $wp_version, GEOCODER_MAP_REQUIRED_WP_VERSION, '<' ) ) {
-		return false;
-	}
-	if ( is_multisite() != GEOCODER_MAP_REQUIRED_WP_NETWORK ) {
-		return false;
-	}
+    if (version_compare(PHP_VERSION, GEOCODER_MAP_REQUIRED_PHP_VERSION, '<')) {
+        return false;
+    }
+    if (version_compare($wp_version, GEOCODER_MAP_REQUIRED_WP_VERSION, '<')) {
+        return false;
+    }
+    if (is_multisite() != GEOCODER_MAP_REQUIRED_WP_NETWORK) {
+        return false;
+    }
 
-	return true;
+    return true;
 
 }
 
@@ -59,10 +62,11 @@ function geocoder_map_requirements_met() {
  *
  * @since    1.0.0
  */
-function geocoder_map_show_requirements_error() {
+function geocoder_map_show_requirements_error()
+{
 
-	global $wp_version;
-	require_once( dirname( __FILE__ ) . '/views/admin/errors/requirements-error.php' );
+    global $wp_version;
+    require_once(dirname(__FILE__) . '/views/admin/errors/requirements-error.php');
 
 }
 
@@ -71,42 +75,52 @@ function geocoder_map_show_requirements_error() {
  *
  * @since    1.0.0
  */
-function run_geocoder_map() {
+function run_geocoder_map()
+{
 
-	/**
-	 * Check requirements and load main class
-	 * The main program needs to be in a separate file that only gets loaded if the plugin requirements are met.
-	 * Otherwise older PHP installations could crash when trying to parse it.
-	 **/
-	if ( geocoder_map_requirements_met() ) {
+    /**
+     * Check requirements and load main class
+     * The main program needs to be in a separate file that only gets loaded if the plugin requirements are met.
+     * Otherwise older PHP installations could crash when trying to parse it.
+     **/
+    if (geocoder_map_requirements_met()) {
 
-		/**
-		 * The core plugin class that is used to define internationalization,
-		 * admin-specific hooks, and public-facing site hooks.
-		 */
-		require_once plugin_dir_path( __FILE__ ) . 'includes/class-geocoder-map.php';
+        /**
+         * The core plugin class that is used to define internationalization,
+         * admin-specific hooks, and public-facing site hooks.
+         */
+        require_once plugin_dir_path(__FILE__) . 'includes/class-geocoder-map.php';
 
-		/**
-		 * Begins execution of the plugin.
-		 *
-		 * Since everything within the plugin is registered via hooks,
-		 * then kicking off the plugin from this point in the file does
-		 * not affect the page life cycle.
-		 *
-		 * @since    1.0.0
-		 */
+        /**
+         * Begins execution of the plugin.
+         *
+         * Since everything within the plugin is registered via hooks,
+         * then kicking off the plugin from this point in the file does
+         * not affect the page life cycle.
+         *
+         * @since    1.0.0
+         */
         //metoda zawarta we weczesiej zaladowanej class-geocoder-map.php, laduje caly plugin
         //get instance spwowduej rowniez uruchomienia konstruktora tylko raz i tylko po to jest ta lnia
 
 
-		$plugin = Geocoder_Map::get_instance();
+        $plugin = Geocoder_Map::get_instance();
 
-	} else {
+        //todo:: integrate versioning mechanism with class-geocoder-map-updater classs
+       //Run WP Updater for plugin version
+        $updater = new Geocoder_Map_Updater(__FILE__);
+        $updater->set_username('pablorrr');
+        $updater->set_repository('geocoder-map');
+        $updater->initialize();
 
-		add_action( 'admin_notices', 'geocoder_map_show_requirements_error' );
+
+    } else {
+
+        add_action('admin_notices', 'geocoder_map_show_requirements_error');
         //njprwd laduje definicje metody deactivate_plugins
-		require_once( ABSPATH . 'wp-admin/includes/plugin.php' );//TODO : SPRAWDZ NAJPIERW CZY DEACTIVE PLLUGINS ISTNIEJE!!
-		deactivate_plugins( plugin_basename( __FILE__ ) );
-	}
+        require_once(ABSPATH . 'wp-admin/includes/plugin.php');//TODO : SPRAWDZ NAJPIERW CZY DEACTIVE PLLUGINS ISTNIEJE!!
+        deactivate_plugins(plugin_basename(__FILE__));
+    }
 }
+
 run_geocoder_map();
