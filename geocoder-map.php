@@ -10,7 +10,7 @@
  * Plugin Name:       WP Geocoder Map
  * Plugin URI:        http://example.com/plugin-name-uri/
  * Description:       Print your Google Map by address and set up GM behavior optionally by Settings Page
- * Version:           1.0.0
+ * Version:           2.0.0
  * Author:            Pablozzz Corp
  * Author URI:        http://websitecreator.pl/
  * License:           GPL-2.0+
